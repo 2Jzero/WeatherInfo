@@ -9,7 +9,7 @@ public class weatherTO {
     // 발표 일자
     private String baseDate;
     // 발표 시각
-    private String basetime;
+    private String baseTime;
     // 자료 구분
     private String category;
     // 예측 일자
@@ -18,4 +18,6 @@ public class weatherTO {
     private String fcstTime;
     // 예보 값
     private String fcstValue;
+    // category, fcstValue를 묶은 값
+    private String totalData;
 }
