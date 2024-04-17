@@ -6,9 +6,13 @@
 </head>
 <body>
 
-의정부 장암동 단기 예보 저장 & 조회하기!
-
-<form action="/weatherData" method="post">
+특정 지역 입력하여 단기 예보 저장 & 조회하기!
+시, 군, 동을 정확하게 입력해주세요!
+<br><br>
+<form action="/WeatherData" method="post">
+    시 : <input type="text" name="sido" style="width:5%"/>
+    구 : <input type="text" name="gugun" style="width:5%"/>
+    동 : <input type="text" name="dong" style="width:7%"/>
     <button type="submit">날씨 데이터 DB에 추가하기</button>
 </form>
 <br>

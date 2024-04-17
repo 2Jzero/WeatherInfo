@@ -1,38 +1,36 @@
-package com.project.controller.RestApi;
+package com.project.weather.config;
 
-import com.project.config.weatherListMapperInter;
+import com.project.weather.model.CoordinateTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.project.model.weatherTO;
+import com.project.weather.model.WeatherTO;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.lang.model.type.ArrayType;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @RestController
-public class RestApi {
+public class WeatherData {
 
     @Autowired
-    private weatherListMapperInter mapper;
+    private WeatherListMapperInter mapper;
 
     //2024-04-12 html에서 form태그 이용해서 버튼 누르면 저쪽으로 이동하게끔 해보자
     // 단기 예보를 Json 파싱 하고 DB에 적재하는 메소드
-    @PostMapping("/weatherData")
-    public ResponseEntity<String> postWeatherData() {
+    @PostMapping("/WeatherData")
+    public ResponseEntity<String> postWeatherData(HttpServletRequest request) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -53,8 +51,25 @@ public class RestApi {
         // baseTime을 현재시간에 가까운 것으로 바꾸는 것을 15일날 목표로 하자!!
         String baseTime = "0500";
 
+
         // 호출할 API 링크와 파라미터 정의
         String url = "https://apis.data.go.kr";
+
+        // nx, ny를 가져올 객체 생성
+        GetCoordinate getCoordinate = new GetCoordinate();
+
+        String sido = request.getParameter("sido");
+        String gugun = request.getParameter("gugun");
+        String dong = request.getParameter("dong");
+
+        ResponseEntity<CoordinateTO> coordinate = getCoordinate.CoordinateParam(request, sido, gugun, dong);
+
+        // CoordinateTO 객체에서 x와 y 값을 가져옴
+        CoordinateTO crTO = coordinate.getBody();
+        String x = crTO.getX();
+        String y = crTO.getY();
+
+        System.out.println(x + y);
 
         URI uri = UriComponentsBuilder.fromUriString(url)
                 .path("1360000/VilageFcstInfoService_2.0/getVilageFcst")
@@ -63,8 +78,8 @@ public class RestApi {
                 .queryParam("pageNo", 1)
                 .queryParam("base_date", baseDate)
                 .queryParam("base_time", baseTime)
-                .queryParam("nx", 61)
-                .queryParam("ny", 130)
+                .queryParam("nx", x)
+                .queryParam("ny", y)
                 .queryParam("dataType", "JSON")
                 .build()
                 .toUri();
@@ -100,8 +115,8 @@ public class RestApi {
 
             System.out.println(jsonObject);
 
-            JSONObject response = jsonObject.getJSONObject("response");
-            JSONObject body = response.getJSONObject("body");
+            JSONObject responses = jsonObject.getJSONObject("response");
+            JSONObject body = responses.getJSONObject("body");
             // 하나하나 접근해서 item 안의 내용 파싱
             JSONObject items = body.getJSONObject("items");
             JSONArray item = items.getJSONArray("item");
@@ -109,7 +124,7 @@ public class RestApi {
             for (int i = 0; i < item.length(); i++) {
                 JSONObject itemList = item.getJSONObject(i);
 
-                weatherTO wtTO = new weatherTO();
+                WeatherTO wtTO = new WeatherTO();
                 wtTO.setBaseDate(itemList.getString("baseDate"));
                 wtTO.setBaseTime(itemList.getString("baseTime"));
                 wtTO.setCategory(itemList.getString("category"));
@@ -132,11 +147,11 @@ public class RestApi {
     @GetMapping("/weatherShowData")
     public ResponseEntity<String> getWeatherData() {
         // GET 요청에 대한 처리 로직 작성
-        weatherTO wtTO = new weatherTO();
+        WeatherTO wtTO = new WeatherTO();
 
-        ArrayList<weatherTO> wtList = mapper.weatherList();
+        ArrayList<WeatherTO> wtList = mapper.weatherList();
 
-        for (weatherTO wt : wtList) {
+        for (WeatherTO wt : wtList) {
 
             System.out.println("발표 날짜 : " + wt.getBaseDate() + " 발표 시간 : " + wt.getBaseTime() + " 예측 날짜 : " + wt.getFcstDate() + " 예측 시간 : " + wt.getFcstTime());
 

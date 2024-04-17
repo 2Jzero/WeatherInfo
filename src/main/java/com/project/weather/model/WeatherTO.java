@@ -1,11 +1,11 @@
-package com.project.model;
+package com.project.weather.model;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class weatherTO {
+public class WeatherTO {
     // 발표 일자
     private String baseDate;
     // 발표 시각
