@@ -1,5 +1,7 @@
-package com.project.weather.config;
+package com.project.weather.controller;
 
+import com.project.weather.config.GetCoordinate;
+import com.project.weather.config.WeatherListMapperInter;
 import com.project.weather.model.CoordinateTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
@@ -7,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
